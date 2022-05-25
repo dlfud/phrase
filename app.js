@@ -39,7 +39,7 @@ app.get("/phrase", async (req, res) => {
 
 app.post("/phrase/:id", async (req, res) => {
   const { id } = req.params;
-  const { likePoint, dislikePoint } = req.body;
+  const { likePoint } = req.body;
 
   if (!likePoint) {
     res.status(400).json({
@@ -48,17 +48,33 @@ app.post("/phrase/:id", async (req, res) => {
     return;
   }
 
+  await pool.query(
+    `UPDATE phrase SET likePoint = likePoint + ?
+    WHERE id = ?`,
+    [likePoint, id]
+  );
+
+  // res.json(rows);
+  res.status(201).json({
+    msg: "성공",
+  });
+});
+
+app.post("/phrase/:id", async (req, res) => {
+  const { id } = req.params;
+  const { dislikePoint } = req.body;
+
   if (!dislikePoint) {
     res.status(400).json({
-      msg: "like required",
+      msg: "dislike required",
     });
     return;
   }
 
   await pool.query(
-    `UPDATE phrase SET likePoint = likePoint + ?, dislikePoint = dislikePoint + ?
+    `UPDATE phrase SET dislikePoint = dislikePoint + ?
     WHERE id = ?`,
-    [likePoint, dislikePoint, id]
+    [dislikePoint, id]
   );
 
   // res.json(rows);

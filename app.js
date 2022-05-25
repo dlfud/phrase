@@ -31,12 +31,14 @@ app.get("/phrase", async (req, res) => {
   );
 
   await pool.query(`UPDATE phrase SET hit = hit + 1 WHERE id = ?`, [row.id]);
+  row.hit++;
   res.json([row]);
   // res.json({
   //   data: [row.id],
   // });
 });
 
+//좋아요
 app.post("/phrase/like", async (req, res) => {
   const { id, likePoint } = req.body;
 
@@ -59,6 +61,7 @@ app.post("/phrase/like", async (req, res) => {
   });
 });
 
+//싫어요
 app.post("/phrase/dislikes", async (req, res) => {
   const { id, dislikePoint } = req.body;
 

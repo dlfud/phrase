@@ -36,10 +36,14 @@ app.get('/phrase', async (req, res) => {
         [row.id]
     );
     res.json([row]);
+    // res.json({
+    //   data: [row.id],
+    // });
 });
 
-app.post('/phrase', async (req, res) => {
-  const{likePoint, dislikePoint} = req.body;
+app.patch('/phrase', async (req, res) => {
+  // const{id} = req.params;
+  const{id, likePoint, dislikePoint} = req.body;
 
   if(!likePoint){
     res.status(400).json({
@@ -56,12 +60,14 @@ app.post('/phrase', async (req, res) => {
   }
 
   await pool.query(
-    `UPDATE phrase SET likePoint = likePoint + 1, dislikePoint = dislikePoint + 1`
-  )
+    `UPDATE phrase SET likePoint = likePoint + ?, dislikePoint = dislikePoint + ?
+    WHERE id = ?`, [likePoint, dislikePoint, id]
+  );
 
-  res.status(201).json({
-    msg:"성공",
-  });
+  res.json(rows);
+  // res.status(201).json({
+  //   msg:"성공",
+  // });
 });
 
 app.listen(port);

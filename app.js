@@ -37,9 +37,8 @@ app.get("/phrase", async (req, res) => {
   // });
 });
 
-app.post("/phrase/:id", async (req, res) => {
-  const { id } = req.params;
-  const { likePoint } = req.body;
+app.post("/phrase/like", async (req, res) => {
+  const { id, likePoint } = req.body;
 
   if (!likePoint) {
     res.status(400).json({
@@ -60,9 +59,8 @@ app.post("/phrase/:id", async (req, res) => {
   });
 });
 
-app.post("/phrase/:id", async (req, res) => {
-  const { id } = req.params;
-  const { dislikePoint } = req.body;
+app.post("/phrase/dislikes", async (req, res) => {
+  const { id, dislikePoint } = req.body;
 
   if (!dislikePoint) {
     res.status(400).json({

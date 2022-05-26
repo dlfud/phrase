@@ -25,62 +25,71 @@ function App(){
   //싫어요 누름
   const clickLike = async () => {
     //수정할 데이터 보냄
-    await fetch(`${PHRASE_API_HEAD}/${phrases.id}`,{
+    const data = await fetch(`${PHRASE_API_HEAD}/${phrases.id}`,{
       method: "PATCH",
       headers:{
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        likePoint: phrases.likePoint + 1
+        likePoint: phrases.likePoint + 1,
+        dislikePoint: phrases.dislikePoint
       })
     });
+    const json = await data.json();
+    setPhrases(json.data);
     
     //원래 있던 데이터를 수정
-    const newPhrase = {
-      ...phrases,
-      likePoint: phrases.likePoint + 1
-    };
-    setPhrases(newPhrase);
+    // const newPhrase = {
+    //   ...phrases,
+    //   likePoint: phrases.likePoint + 1
+    // };
+    // setPhrases(newPhrase);
   };
   
   const clickDisLike = async () => {
     //수정할 데이터 보냄
-    await fetch(`${PHRASE_API_HEAD}/${phrases.id}`,{
+    const data = await fetch(`${PHRASE_API_HEAD}/${phrases.id}`,{
       method: "PATCH",
       headers:{
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        likePoint: phrases.likePoint,
         dislikePoint: phrases.dislikePoint + 1
       })
     });
+    const json = await data.json();
+    setPhrases(json.data);
     
     //원래 있던 데이터를 수정
-    const newPhrase = {
-      ...phrases,
-      dislikePoint: phrases.dislikePoint + 1
-    };
-    setPhrases(newPhrase);
+  //   const newPhrase = {
+  //     ...phrases,
+  //     dislikePoint: phrases.dislikePoint + 1
+  //   };
+  //   setPhrases(newPhrase);
   }
   
   return (
     <>
-      <div>
-        작가 : {phrases.author}
-        <br/>
-        명언 : {phrases.content}
-        <br/>
-        조회수 : {phrases.hit} 
-        <br/>
-        좋아요 : {phrases.likePoint}
-        <br/>
-        싫어요 : {phrases.dislikePoint}
+      <div className="flex-1 flex items-center justify-center">
+        <div>
+          작가 : {phrases.author}
+          <br/>
+          명언 : {phrases.content}
+          <br/>
+          조회수 : {phrases.hit} 
+          <br/>
+          좋아요 : {phrases.likePoint}
+          <br/>
+          싫어요 : {phrases.dislikePoint}
+          <br/>
+          <button className="border rounded p-2" onClick={clickLike}>좋아요</button>
+          &nbsp;
+          <button className="border rounded p-2" onClick={clickDisLike}>싫어요</button>
+          &nbsp;
+          <button className="border rounded p-2" onClick={phraseRandom}>다른명언</button>
+        </div>
       </div>
-      <button onClick={clickLike}>좋아요</button>
-      &nbsp;
-      <button onClick={clickDisLike}>싫어요</button>
-      &nbsp;
-      <button onClick={phraseRandom}>다음명언</button>
     </>
   );
 }

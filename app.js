@@ -53,6 +53,7 @@ app.get("/phrase/random", async (req, res) => {
 //db수정
 app.patch("/phrase/:id", async (req, res) => {
   const { id } = req.params;
+  
   //아이디에 맞는 값들 가져오기
   const[[phraseRow]] = await pool.query(
     `SELECT * FROM phrase WHERE id = ?`, [id]

@@ -10,6 +10,7 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  dateStrings: true, // 날짜 시간 이뿌게
 });
 
 const app = express();
@@ -25,14 +26,22 @@ const corsOptions = {
 app.use(cors());
 
 /* 명언 랜덤 출력 */
-app.get("/phrase", async (req, res) => {
-  const [[row]] = await pool.query(
+app.get("/phrase/random", async (req, res) => {
+  const [[phraseRow]] = await pool.query(
     `SELECT * FROM phrase ORDER BY RAND() LIMIT 1`
   );
 
-  await pool.query(`UPDATE phrase SET hit = hit + 1 WHERE id = ?`, [row.id]);
-  row.hit++;
-  res.json([row]);
+  if (phraseRow === undefined) {
+    res.status(404).json({
+      resultCode: "F-1",
+      msg: "404 not found",
+    });
+    return;
+  }
+
+  await pool.query(`UPDATE phrase SET hit = hit + 1 WHERE id = ?`, [phraseRow.id]);
+  phraseRow.hit++;
+  res.json([phraseRow]);
   // res.json({
   //   data: [row.id],
   // });

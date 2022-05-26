@@ -41,13 +41,60 @@ app.get("/phrase/random", async (req, res) => {
 
   await pool.query(`UPDATE phrase SET hit = hit + 1 WHERE id = ?`, [phraseRow.id]);
   phraseRow.hit++;
-  res.json([phraseRow]);
-  // res.json({
-  //   data: [row.id],
-  // });
+
+  // res.json([phraseRow]); //배열로 전달됬음...뭐지...?
+  res.json({
+    resultCode: "S-1",
+    msg: "성공",
+    data: phraseRow, //배열로 전달되지 않음
+  });
 });
 
-//좋아요
+//db수정
+app.patch("/phrase/:id", async (req, res) => {
+  const { id } = req.params;
+  //아이디에 맞는 값들 가져오기
+  const[[phraseRow]] = await pool.query(
+    `SELECT * FROM phrase WHERE id = ?`, [id]
+  );
+
+  if (phraseRow === undefined) {
+    res.status(404).json({
+      resultCode: "F-1",
+      msg: "404 not found",
+    });
+    return;
+  }
+
+  //받아온 값. 받아온 값이 없으면 기존의 값을 넣음
+  const {
+    content = phraseRow.content,
+    author = phraseRow.author,
+    likePoint = phraseRow.goodLikeCount,
+    dislikePoint = phraseRow.badLikeCount,
+  } = req.body;
+
+  //업데이트
+  await pool.query(
+    `UPDATE phrase SET content = ?, author = ?, likePoint = ?, dislikePoint = ?
+    WHERE id = ?`,
+    [content, author, likePoint, dislikePoint, id]
+  );
+
+  //변경된 명언을 다시 불러옴
+  const[[modifyPhraseRow]] = await pool.query(
+    `SELECT * FROM phrase WHERE id = ?`, [id]
+  );
+
+  //데이터 전송
+  res.json({
+    result: "S-1",
+    msg:"성공",
+    data: modifyPhraseRow,
+  });
+});
+
+/*좋아요
 app.post("/phrase/like", async (req, res) => {
   const { id, likePoint } = req.body;
 
@@ -69,8 +116,9 @@ app.post("/phrase/like", async (req, res) => {
     msg: "성공",
   });
 });
+*/
 
-//싫어요
+/*싫어요
 app.post("/phrase/dislikes", async (req, res) => {
   const { id, dislikePoint } = req.body;
 
@@ -92,6 +140,7 @@ app.post("/phrase/dislikes", async (req, res) => {
     msg: "성공",
   });
 });
+*/
 
 app.listen(port);
 

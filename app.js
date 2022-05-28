@@ -39,8 +39,11 @@ app.get("/phrase/random", async (req, res) => {
     return;
   }
 
-  await pool.query(`UPDATE phrase SET hit = hit + 1 WHERE id = ?`, [phraseRow.id]);
   phraseRow.hit++;
+
+  await pool.query(`UPDATE phrase SET hit = hit + 1 WHERE id = ?`, [
+    phraseRow.id,
+  ]);
 
   // res.json([phraseRow]); //배열로 전달됬음...뭐지...?
   res.json({
@@ -53,11 +56,11 @@ app.get("/phrase/random", async (req, res) => {
 //db수정
 app.patch("/phrase/:id", async (req, res) => {
   const { id } = req.params;
-  
+
   //아이디에 맞는 값들 가져오기
-  const[[phraseRow]] = await pool.query(
-    `SELECT * FROM phrase WHERE id = ?`, [id]
-  );
+  const [[phraseRow]] = await pool.query(`SELECT * FROM phrase WHERE id = ?`, [
+    id,
+  ]);
 
   if (phraseRow === undefined) {
     res.status(404).json({
@@ -83,15 +86,57 @@ app.patch("/phrase/:id", async (req, res) => {
   );
 
   //변경된 명언을 다시 불러옴
-  const[[modifyPhraseRow]] = await pool.query(
-    `SELECT * FROM phrase WHERE id = ?`, [id]
+  const [[modifyPhraseRow]] = await pool.query(
+    `SELECT * FROM phrase WHERE id = ?`,
+    [id]
   );
 
   //데이터 전송
   res.json({
     result: "S-1",
-    msg:"성공",
+    msg: "성공",
     data: modifyPhraseRow,
+  });
+});
+
+//명언추가
+app.post("/phrase/new", async (req, res) => {
+  const { author, content } = req.body;
+
+  if (!author) {
+    res.status(400).json({
+      resultCode: "F-1",
+      msg: "author required",
+    });
+    return;
+  }
+
+  if (!content) {
+    res.status(400).json({
+      resultCode: "F-1",
+      msg: "content required",
+    });
+    return;
+  }
+
+  const [insertRow] = await pool.query(
+    `INSERT INTO phrase SET author = ?, content = ?`,
+    [author, content]
+  );
+
+  await pool.query(`UPDATE phrase SET hit = hit + 1 WHERE id = ?`, [
+    insertRow.insertId,
+  ]);
+
+  const [[newPhraseRow]] = await pool.query(
+    `SELECT * FROM phrase WHERE id = ?`,
+    [insertRow.insertId]
+  );
+
+  res.json({
+    resultCode: "S-1",
+    msg: "성공",
+    data: newPhraseRow,
   });
 });
 

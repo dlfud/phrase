@@ -11,6 +11,7 @@ function App(){
   //난수 저장할 변수
   const[index, setIndex] = useState(0);
   
+  //난수 생성
   const random = () => {
     //0 ~ 123까지 난수
     const randomIndex = Math.floor(Math.random() * phrases.length)
@@ -46,7 +47,7 @@ function App(){
     
     setPhrases(json);
     // console.log(json);
-    
+    //데이터 가져올 때 랜덤하게 숫자 불러옴
     const randomIndex = Math.floor(Math.random() * json.length)
     setIndex(randomIndex);
   }
